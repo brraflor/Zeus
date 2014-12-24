@@ -1,0 +1,138 @@
+//===============================================//
+//  Author:      Wastelander_sage (brraflor)     //
+//  Date:        02/20/2014                      //
+//  Program:     Lab 4 assignment                //
+//  Description: Convert Color image             //
+//               Into gray and sepia             //
+//===============================================//
+import java.awt.Color;
+import java.awt.Graphics2D;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+import java.net.URL;
+
+import javax.imageio.IIOImage;
+import javax.imageio.ImageIO;
+import javax.imageio.ImageWriteParam;
+import javax.imageio.ImageWriter;
+import javax.imageio.plugins.jpeg.JPEGImageWriteParam;
+import javax.imageio.stream.ImageOutputStream;
+
+public class ChangeColor{
+    
+  //===================================//
+  // Reads In An Image Off The Web     //
+  //===================================//
+
+  static BufferedImage readImage( String fname ) throws Exception {
+
+    BufferedImage image = ImageIO.read( new File(fname) );
+    return( image );
+  }
+
+  //===================================//
+  // Saves File                        //
+  //===================================//
+
+  public static void saveImage( BufferedImage img, File file ) throws IOException {
+        ImageWriter      writer = null;
+        java.util.Iterator iter = ImageIO.getImageWritersByFormatName("jpg");
+
+        if( iter.hasNext() ){
+            writer = (ImageWriter)iter.next();
+        }
+
+        ImageOutputStream ios = ImageIO.createImageOutputStream( file );
+        writer.setOutput(ios);
+
+        ImageWriteParam param = new JPEGImageWriteParam( java.util.Locale.getDefault() );
+        param.setCompressionMode(ImageWriteParam.MODE_EXPLICIT) ;
+        param.setCompressionQuality(0.98f);
+
+        writer.write(null, new IIOImage( img, null, null ), param);
+    }
+    
+  //===================================//
+  // Converts Color Image To Grayscale //
+  //===================================//
+
+  public static BufferedImage color2gray( BufferedImage inImage ) {
+    int            width    = inImage.getWidth();
+    int            height   = inImage.getHeight();
+    BufferedImage  outImage = new BufferedImage( width, height, BufferedImage.TYPE_3BYTE_BGR );
+
+    for (int i= 0; i < width;i++) //Loop to create a number for every pixel of the image Horizontally
+        for(int j = 0; j < height;j++) //Loop to create a number for every pixel of the image Vertically
+        {
+           Color c = new Color(inImage.getRGB(i,j)); // getRBG helps us split the image into red, green, blue
+           double in_r = c.getRed(); //red pixel
+           double in_g = c.getGreen(); //green pixel          
+           double in_b = c.getBlue(); //blue pixel
+            
+          int gray = (int)(in_r * 0.2126f + in_g * 0.7152f + in_b * 0.0722f);//Formula to chnage the pixels into gray
+          
+           Color d = new Color(gray, gray, gray); //In order to put the red, green, blue into getRGB
+           int a = d.getRGB(); //To store the values into one variable
+           outImage.setRGB(i,j,a); // Helps us create back the image with the new pixels
+           
+        }   
+           
+    return( outImage );
+  }
+
+  //===================================//
+  // Converts Color Image To Sepia     //
+  //===================================//
+    
+  public static BufferedImage color2sepia( BufferedImage inImage ) {
+        
+      int            width    = inImage.getWidth();
+      int            height   = inImage.getHeight();
+      BufferedImage  outImage = new BufferedImage( width, height, BufferedImage.TYPE_3BYTE_BGR );
+         for (int i= 0; i < width;i++) //Loop to create a number for every pixel of the image Horizontally
+            {
+              for(int j = 0; j < height;j++)//Loop to create a number for every pixel of the image Vertically
+              {     
+                Color c = new Color(inImage.getRGB(i,j)); // SPlit the image into red, green, blue pixels
+                double in_r = c.getRed();     // Red pixel
+                double in_g = c.getGreen();   // Green Pixel         
+                double in_b = c.getBlue();    // Blue Pixel 
+                  //Formula to convert pixels into Sepia pixel values      
+                 int out_r = (int)((in_r * .393) + (int)(in_g *.769) + (int)(in_b * .189));
+                 if(out_r > 255) out_r = 255; //cap the value so that it won't pass 255
+                 int out_g = (int)((in_r * .349) + (int)(in_g *.686) + (int)(in_b * .168));
+                 if(out_g > 255) out_g = 255; //cap the value so that it won't pass 255
+                 int out_b = (int)((in_r * .272) + (int)(in_g *.534) + (int)(in_b * .131));
+                 if(out_b > 255) out_b = 255;//cap the value so that it won't pass 255
+                     
+                 Color d = new Color(out_r, out_g, out_b); //In order to put the red, green, blue into getRGB
+                 int a = d.getRGB();      // To store the values into one variable
+                 outImage.setRGB(i,j,a);  // Helps us create back the image with the new pixels    
+              }   
+             }
+    return( outImage );
+  }
+
+  //===================================//
+  // Main Method                       //
+  //===================================//
+
+  public static void main(String[] args) throws Exception {
+    
+    BufferedImage colorImage, grayImage, sepiaImage;
+
+    if (args.length != 1)
+        System.out.println( "usage is: java ChangeColor filename" );
+    else
+    {
+    colorImage = readImage  ( args[0] );
+    grayImage  = color2gray ( colorImage );
+    sepiaImage = color2sepia( colorImage );
+
+    saveImage( grayImage,  new File( "gray" + args[0] ) );
+    saveImage( sepiaImage, new File( "sepia"+ args[0] ) );
+    }
+  }
+    
+}
