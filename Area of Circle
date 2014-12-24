@@ -1,0 +1,24 @@
+// Wastlenader_sage
+
+import java.util.*;
+public class CircleArea
+{
+	public static void main(String[] args)
+	{
+		Scanner sc = new Scanner(System.in);
+		double area;
+		double radious;
+		double perimeter;
+		
+		System.out.println("Enter Radious: ");
+		radious = sc.nextDouble();
+		
+		area=Math.PI*(radious*radious);
+		perimeter = 2*Math.PI*radious;
+		
+		System.out.format("Area is %.2f\n",area);
+		System.out.format("Perimeter is %.2f\n", perimeter);
+	}
+}
+
+	
